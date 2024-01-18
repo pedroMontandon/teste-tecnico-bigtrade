@@ -1,5 +1,6 @@
 import express, { RequestHandler } from 'express';
 import router from './routes';
+require('dotenv').config();
 
 class App {
     public app: express.Express;   
@@ -30,5 +31,5 @@ class App {
     }
   }
   
-  export default App;
-  export const { app } = new App();
+const appInstance = new App();
+export default appInstance;
