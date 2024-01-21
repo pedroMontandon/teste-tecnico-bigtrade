@@ -1,4 +1,4 @@
-import { Schema, Model, model, Error } from 'mongoose';
+import { Schema, Model, model } from 'mongoose';
 import { IUser } from '../types/IUser';
 
 const UserSchema = new Schema({
@@ -14,12 +14,11 @@ export default class UserModel {
     this._model = model<IUser>('User', UserSchema);
   }
 
-  async create(user: IUser): Promise<IUser | null> {
-    try {
-      return await this._model.create(user);
-    } catch (err: any) {
-      return err.message;
-    }
+  async create(user: IUser): Promise<Partial<IUser> | null> {
+    const createdUser = await this._model.create(user);
+    const safeUser: Partial<IUser> = createdUser.toObject();
+    delete safeUser.password;
+    return safeUser;
   }
 
   async findById(id: string) {
@@ -30,20 +29,8 @@ export default class UserModel {
     }
   }
 
-  async findByEmail(email: string) {
-    try {
-      return await this._model.findOne({ email });
-    } catch (err: any) {
-      return err.message;
-    }
-  }
-
   async update(id: string, user: IUser) {
-    try {
-      return await this._model.findByIdAndUpdate(id, user);
-    } catch (err: any) {
-      return err.message;
-    }
+    return await this._model.findByIdAndUpdate(id, user);
   }
 
   async delete(id: string) {

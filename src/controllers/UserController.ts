@@ -19,7 +19,7 @@ export default class UserController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { user } = req.body;
+    const user = req.body;
     const { status, data } = await this.userService.update(id, user);
     return res.status(mapStatusHTTP(status)).json(data);
   }
