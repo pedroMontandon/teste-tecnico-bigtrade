@@ -14,29 +14,26 @@ export default class UserService {
     const existingUser = await this.userModel.findByEmail(user.email);
     if (existingUser) return { status: 'CONFLICT', data: { message: 'User already exists' } };
     const encryptedPassword = bcrypt.hashSync(user.password, 10);
-    user.password = encryptedPassword;
-    await this.userModel.create(user);
+    const newUser = { ...user, password: encryptedPassword }
+    await this.userModel.create(newUser);
     return { status: 'CREATED', data: { message: 'User created' } };
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<ServiceResponse<Partial<IUser>>> {
     const user = await this.userModel.findById(id);
     if (!user) return { status: 'NOT_FOUND', data: { message: 'User not found' } };
     return { status: 'SUCCESSFUL', data: user };
   }
 
-  async update(id: string, user: IUser) {
-    const foundUser = await this.userModel.findById(id);
-    if (!foundUser) return { status: 'NOT_FOUND', data: { message: 'User not found' } };
-    if (user.password !== foundUser.password) {
-      const encryptedPassword = bcrypt.hashSync(user.password, 10);
-      user.password = encryptedPassword;
-    }
-    const updatedUser = await this.userModel.update(id, user);
+  async update(id: string, user: IUser): Promise<ServiceResponse<Partial<IUser> | null>> {
+    const encryptedPassword = bcrypt.hashSync(user.password, 10);
+    const newUser = { ...user, password: encryptedPassword}
+    const updatedUser = await this.userModel.update(id, newUser);
+    if (!updatedUser) return { status: 'NOT_FOUND', data: { message: 'User not found' } };
     return { status: 'SUCCESSFUL', data: updatedUser };
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<ServiceResponse<{ message: string }>> {
     const deletedUser = await this.userModel.delete(id);
     if (!deletedUser) return { status: 'NOT_FOUND', data: { message: 'User not found' } };
     return { status: 'SUCCESSFUL', data: { message: `User ${id} has been deleted` } };

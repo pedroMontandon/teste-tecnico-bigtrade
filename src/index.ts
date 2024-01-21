@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
-import appInstance from './app';
+import appInstance from './App';
 import dotenv from 'dotenv';
+import initializeDatabase from './utils/initializeDatabase';
 
 dotenv.config();
 
@@ -23,3 +24,13 @@ conexao.on('error', console.error.bind(console, 'Erro na conexão com o MongoDB:
 conexao.once('open', () => {
   console.log('Conexão com o MongoDB estabelecida com sucesso!');
 });
+
+const migrate = async () => {
+  try {
+    await initializeDatabase();
+    console.log('Dados populados com sucesso!');
+  } catch (err) {
+    console.error('Erro ao popular dados no MongoDB:', err);
+  }
+}
+migrate();

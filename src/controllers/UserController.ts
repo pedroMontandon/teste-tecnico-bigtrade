@@ -6,7 +6,7 @@ export default class UserController {
   constructor(private userService = new UserService()) {}
   
   async create(req: Request, res: Response) {
-    const { user } = req.body;
+    const user = req.body;
     const { status, data } = await this.userService.create(user);
     return res.status(mapStatusHTTP(status)).json(data);
   }

@@ -1,5 +1,6 @@
 import express, { RequestHandler } from 'express';
 import router from './routes';
+import ErrorMiddleware from './middlewares/ErrorMiddleware';
 require('dotenv').config();
 
 class App {
@@ -9,6 +10,7 @@ class App {
       this.app = express();
       this.config();
       this.routes();
+      this.app.use(ErrorMiddleware.handleErrors);
     }
   
     private config(): void {
@@ -24,6 +26,10 @@ class App {
     
     private routes(): void {
       this.app.use(router);
+    }
+
+    private errorHandling(): void {
+      this.app.use(ErrorMiddleware.handleErrors);
     }
   
     public start(PORT: string | number) {

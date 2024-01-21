@@ -1,39 +1,56 @@
-import mongoose from 'mongoose';
+import { Schema, Model, model, Error } from 'mongoose';
 import { IUser } from '../types/IUser';
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   displayName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: true, select: false },
 });
 
 export default class UserModel {
-  private static _model: mongoose.Model<IUser>;
+  private _model: Model<IUser>;
 
-  public static get model(): mongoose.Model<IUser> {
-    if (!this._model) {
-      this._model = mongoose.model<IUser>('User', UserSchema);
-    }
-    return this._model;
+  constructor() {
+    this._model = model<IUser>('User', UserSchema);
   }
 
-  async create(user: IUser) {
-    await UserModel.model.create(user);
+  async create(user: IUser): Promise<IUser | null> {
+    try {
+      return await this._model.create(user);
+    } catch (err: any) {
+      return err.message;
+    }
   }
 
   async findById(id: string) {
-    return await UserModel.model.findById(id);
+    try {
+      return await this._model.findById(id);
+    } catch (err: any) { 
+      return err.message;
+    }
   }
 
   async findByEmail(email: string) {
-    return await UserModel.model.findOne({ email });
+    try {
+      return await this._model.findOne({ email });
+    } catch (err: any) {
+      return err.message;
+    }
   }
 
   async update(id: string, user: IUser) {
-    return await UserModel.model.findByIdAndUpdate(id, user);
+    try {
+      return await this._model.findByIdAndUpdate(id, user);
+    } catch (err: any) {
+      return err.message;
+    }
   }
 
   async delete(id: string) {
-    return await UserModel.model.findByIdAndDelete(id);
+    try {
+      return await this._model.findByIdAndDelete(id);
+    } catch (err: any) {
+      return err.message;
+    }
   }
 }

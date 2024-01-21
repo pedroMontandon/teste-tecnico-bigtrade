@@ -17,4 +17,11 @@ export default class UserValidations {
     }
     return next();
   }
+
+  static validateId(req: Request, res: Response, next: NextFunction): Response | void {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: 'Missing required fields' });
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) return res.status(400).json({ message: 'Invalid id' });
+    return next();
+  }
 }
