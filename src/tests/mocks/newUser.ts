@@ -2,7 +2,7 @@ import { IUser } from "../../types/IUser";
 
 
 export const retrievedUser = {
-  id: 'valid_id',
+  id: '65ad8856fd2988054efc6577',
   displayName: 'Chapolin Colorado',
   email: 'chapolin@email.com',
 }
