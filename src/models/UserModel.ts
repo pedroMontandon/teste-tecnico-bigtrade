@@ -1,10 +1,11 @@
 import { Schema, Model, model } from 'mongoose';
-import { IUser } from '../types/IUser';
+import { INewUser, IUser } from '../types/IUser';
 
 const UserSchema = new Schema({
   displayName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, select: false },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' }
 });
 
 export default class UserModel {
@@ -14,14 +15,14 @@ export default class UserModel {
     this._model = model<IUser>('User', UserSchema);
   }
 
-  async create(user: IUser): Promise<Partial<IUser> | null> {
+  async create(user: INewUser): Promise<Partial<IUser> | null> {
     const createdUser = await this._model.create(user);
     const safeUser: Partial<IUser> = createdUser.toObject();
     delete safeUser.password;
     return safeUser;
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<Partial<IUser> | null> {
     try {
       return await this._model.findById(id);
     } catch (err: any) { 
@@ -29,7 +30,15 @@ export default class UserModel {
     }
   }
 
-  async update(id: string, user: IUser) {
+  async findByEmail(email: string): Promise<Partial<IUser> | null> {
+    try {
+      return await this._model.findOne({ email }).select('+password');
+    } catch (err: any) {
+      return err.message;
+    }
+  }
+
+  async update(id: string, user: INewUser): Promise<Partial<IUser> | null> {
     return await this._model.findByIdAndUpdate(id, user);
   }
 

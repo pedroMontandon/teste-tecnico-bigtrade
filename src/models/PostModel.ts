@@ -1,0 +1,51 @@
+import { Schema, Model, model } from 'mongoose';
+import { IPost } from '../types/IPost';
+
+const PostSchema = new Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  userId: { type: String, required: true },
+  published: { type: Date, required: true },
+  updated: { type: Date, required: true },
+});
+
+export default class PostModel {
+  private _model: Model<IPost>;
+
+  constructor() {
+    this._model = model<IPost>('Post', PostSchema);
+  }
+
+  async create(post: IPost): Promise<IPost | null> {
+    const createdPost = await this._model.create(post);
+    return createdPost.toObject();
+  }
+
+  async findAll(): Promise<Partial<IPost>[]> {
+    try {
+      return await this._model.find();
+    } catch (err: any) {
+      return err.message;
+    }
+  }
+
+  async findById(id: string): Promise<IPost | null> {
+    try {
+      return await this._model.findById(id);
+    } catch (err: any) { 
+      return err.message;
+    }
+  }
+
+  async update(id: string, post: IPost): Promise<IPost | null> {
+    return await this._model.findByIdAndUpdate(id, post);
+  }
+
+  async delete(id: string) {
+    try {
+      return await this._model.findByIdAndDelete(id);
+    } catch (err: any) {
+      return err.message;
+    }
+  }
+}

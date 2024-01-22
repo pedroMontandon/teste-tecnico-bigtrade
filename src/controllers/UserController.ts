@@ -11,6 +11,12 @@ export default class UserController {
     return res.status(mapStatusHTTP(status)).json(data);
   }
 
+  async login(req: Request, res: Response) {
+    const { email, password } = req.body;
+    const { status, data } = await this.userService.login(email, password);
+    return res.status(mapStatusHTTP(status)).json(data);
+  }
+
   async findById(req: Request, res: Response) {
     const { id } = req.params;
     const { status, data } = await this.userService.findById(id);
@@ -20,13 +26,15 @@ export default class UserController {
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const user = req.body;
-    const { status, data } = await this.userService.update(id, user);
+    const token = req.headers.authorization;
+    const { status, data } = await this.userService.update(id, user, token!);
     return res.status(mapStatusHTTP(status)).json(data);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, data } = await this.userService.delete(id);
+    const token = req.headers.authorization;
+    const { status, data } = await this.userService.delete(id, token!);
     return res.status(mapStatusHTTP(status)).json(data);
   }
 }

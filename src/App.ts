@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import router from './routes';
-import ErrorMiddleware from './middlewares/ErrorMiddleware';
 
 dotenv.config();
 
@@ -14,7 +13,6 @@ class App {
     this.config();
     this.routes();
     this.setupDatabase();
-    this.app.use(ErrorMiddleware.handleErrors);
   }
 
   private config(): void {
@@ -46,7 +44,7 @@ class App {
       console.log('Conexão com o MongoDB estabelecida com sucesso!');
     } catch (error) {
       console.error('Erro na conexão com o MongoDB:', error);
-      process.exit(1); // Encerra o aplicativo em caso de falha na conexão
+      process.exit(1);
     }
   }
 

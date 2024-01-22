@@ -5,7 +5,6 @@ import chaiHttp from 'chai-http';
 import App from '../../App';
 import UserModel from '../../models/UserModel';
 import { newValidUser, retrievedUser, userWithInvalidEmail, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword } from '../mocks/newUser';
-import UserValidations from '../../middlewares/UserValidations';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -84,7 +83,6 @@ describe('get /users/:id Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
   it('should return 200 and a user object', async function () {
     const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(retrievedUser);
-    const verifyIdStub = sinon.stub(UserValidations, 'validateId').returns(undefined);
     const res = await chai.request(app).get(`${route}/${retrievedUser.id}`);
     expect(res.status).to.equal(200);
     expect(res.body).to.be.an('object');
@@ -108,5 +106,71 @@ describe('get /users/:id Integration Tests', () => {
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('message');
     expect(res.body.message).to.equal('Invalid id');
+  });
+});
+
+describe('put /users/:id Integration Tests', () => {
+  beforeEach(() => { sinon.restore(); });
+  it('should return 200 and a user object', async function () {
+    const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(retrievedUser);
+    const updateStub = sinon.stub(UserModel.prototype, 'update').resolves(retrievedUser);
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('id');
+    expect(res.body.displayName).to.equal(retrievedUser.displayName);
+    expect(res.body.email).to.equal(retrievedUser.email);
+    sinon.assert.calledOnce(findByIdStub);
+    sinon.assert.calledOnce(updateStub);
+  });
+  it('should return 404 if user is not found', async function () {
+    const updateStub = sinon.stub(UserModel.prototype, 'update').resolves(null);
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    expect(res.status).to.equal(404);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('User not found');
+    sinon.assert.calledOnce(updateStub);
+  });
+  it('should return 409 if email is already in use', async function () {
+    const updateStub = sinon.stub(UserModel.prototype, 'update').throws({ code: 11000 });
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    expect(res.status).to.equal(409);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Email address is already in use by another user.');
+    sinon.assert.calledOnce(updateStub);
+  });
+  it('should return 500 if something goes wrong', async function () {
+    const updateStub = sinon.stub(UserModel.prototype, 'update').throws({ message: 'Internal Server Error' });
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    expect(res.status).to.equal(500);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Internal Server Error');
+    sinon.assert.calledOnce(updateStub);
+  });
+});
+
+describe('delete /users/:id Integration Tests', () => {
+  beforeEach(() => { sinon.restore(); });
+  it('should return 200 and a user object', async function () {
+    const deleteStub = sinon.stub(UserModel.prototype, 'delete').resolves(retrievedUser);
+    const res = await chai.request(app).delete(`${route}/${retrievedUser.id}`);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('id');
+    expect(res.body.displayName).to.equal(retrievedUser.displayName);
+    expect(res.body.email).to.equal(retrievedUser.email);
+    sinon.assert.calledOnce(deleteStub);
+  });
+  it('should return 404 if user is not found', async function () {
+    const deleteStub = sinon.stub(UserModel.prototype, 'delete').resolves(null);
+    const res = await chai.request(app).delete(`${route}/${retrievedUser.id}`);
+    expect(res.status).to.equal(404);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('User not found');
+    sinon.assert.calledOnce(deleteStub);
   });
 });
