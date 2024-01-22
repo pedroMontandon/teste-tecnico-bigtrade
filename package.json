@@ -1,27 +1,65 @@
 {
-  "name": "teste-tecnico-bigtrade",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./dist/index.js",
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "nodemon": "nodemon ./dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./dist/index.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "mongoose": "^8.1.0",
-    "nodemon": "^3.0.3",
-    "typescript": "^5.3.3"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/express": "^4.17.21",
-    "@types/mongoose": "^5.11.97"
+    "name": "teste-tecnico-bigtrade",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./dist/index.js",
+    "scripts": {
+      "build": "tsc --project tsconfig.json",
+      "coverage": "nyc npm run test && nyc report --reporter=text-lcov | coveralls",
+      "nodemon": "nodemon ./dist/index.js",
+      "test": "mocha -r ts-node/register ./src/tests/**/**/*.ts -t 10000 --exit",
+      "start": "node ./dist/index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "2.4.3",
+        "bull": "^4.10.4",
+        "cors": "2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "4.17.1",
+        "express-async-errors": "3.1.1",
+        "jest": "27.4.3",
+        "jsonwebtoken": "8.5.1",
+        "mongoose": "^8.1.0",
+        "mysql2": "2.3.3",
+        "nodemailer": "^6.9.4",
+        "sequelize": "6.25.5"
+    },
+    "devDependencies": {
+        "@istanbuljs/nyc-config-typescript": "1.0.2",
+        "@types/bcryptjs": "2.4.2",
+        "@types/chai": "4.3.0",
+        "@types/chai-http": "4.2.0",
+        "@types/cors": "2.8.12",
+        "@types/express": "4.17.13",
+        "@types/jest": "^29.5.3",
+        "@types/jsonwebtoken": "8.5.6",
+        "@types/mocha": "^9.1.0",
+        "@types/mongoose": "^5.11.97",
+        "@types/node": "^16.11.7",
+        "@types/nodemailer": "^6.4.8",
+        "@types/sequelize": "4.28.10",
+        "@types/sinon": "10.0.11",
+        "@types/validator": "13.6.6",
+        "@typescript-eslint/eslint-plugin": "5.3.1",
+        "@typescript-eslint/parser": "5.3.1",
+        "chai": "4.3.6",
+        "chai-http": "4.3.0",
+        "eslint": "7.32.0",
+        "eslint-config-airbnb-base": "15.0.0",
+        "eslint-config-airbnb-typescript": "15.0.0",
+        "eslint-plugin-import": "2.25.3",
+        "eslint-plugin-mocha": "9.0.0",
+        "eslint-plugin-sonarjs": "0.10.0",
+        "mocha": "9.2.1",
+        "nodemon": "2.0.15",
+        "nyc": "15.1.0",
+        "sequelize-cli": "6.3.0",
+        "sinon": "13.0.1",
+        "ts-node": "10.7.0",
+        "ts-node-dev": "1.1.8",
+        "typescript": "4.4.4"
+    }
   }
-}
+  

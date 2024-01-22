@@ -1,0 +1,42 @@
+{
+  "name": "teste-tecnico-bigtrade",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "coverage": "nyc npm run test && nyc report --reporter=text-lcov | coveralls",
+    "nodemon": "nodemon ./dist/index.js",
+    "test": "mocha -r ts-node/register ./src/tests/**/**/*.ts -t 10000 --exit",
+    "start": "node ./dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-errors": "3.1.1",
+    "mongoose": "^8.1.0",
+    "nodemon": "^3.0.3",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@tsconfig/node-lts-strictest-esm": "^18.12.1",
+    "@types/bcrypt": "^5.0.2",
+    "@types/chai": "^4.3.11",
+    "@types/chai-http": "^4.2.0",
+    "@types/express": "^4.17.21",
+    "@types/mocha": "^10.0.6",
+    "@types/mongoose": "^5.11.97",
+    "@types/sinon": "^17.0.3",
+    "chai": "^5.0.0",
+    "chai-http": "4.3.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "sinon": "^17.0.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "1.1.8"
+  }
+}

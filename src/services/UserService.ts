@@ -1,7 +1,7 @@
 import UserModel from '../models/UserModel';
 import { IUser } from '../types/IUser';
 import { ServiceResponse } from '../types/ServiceResponseTypes';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export default class UserService {
   private userModel: UserModel;
@@ -14,7 +14,7 @@ export default class UserService {
 
   async create(user: IUser): Promise<ServiceResponse< Partial<IUser> | null>> {
     try {
-      const encryptedPassword = bcrypt.hashSync(user.password, 10);
+      const encryptedPassword = await bcrypt.hash(user.password, 10);
       const newUser = { ...user, password: encryptedPassword }
       const createdUser =  await this.userModel.create(newUser);
       return { status: 'CREATED', data: createdUser };
@@ -32,7 +32,7 @@ export default class UserService {
 
   async update(id: string, user: IUser): Promise<ServiceResponse<Partial<IUser> | null>> {
     try {
-      const encryptedPassword = bcrypt.hashSync(user.password, 10);
+      const encryptedPassword = await bcrypt.hash(user.password, 10);
       const newUser = { ...user, password: encryptedPassword }
       const updatedUser = await this.userModel.update(id, newUser);
       if (!updatedUser) return { status: 'NOT_FOUND', data: { message: this.userNotFound } };
