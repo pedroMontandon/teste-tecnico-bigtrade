@@ -4,7 +4,9 @@ import chaiHttp from 'chai-http';
 
 import App from '../../App';
 import UserModel from '../../models/UserModel';
-import { newValidUser, retrievedUser, userWithInvalidEmail, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword } from '../mocks/newUser';
+import { loginCredentials, newValidUser, retrievedUser, userWithInvalidEmail, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword } from '../mocks/newUserMocks';
+import JwtUtils from '../../utils/JwtUtils';
+import * as bcrypt from 'bcryptjs';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -79,42 +81,59 @@ describe('post /users Integration Tests', () => {
   });
 });
 
-describe('get /users/:id Integration Tests', () => {
+describe('post /users/login Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
-  it('should return 200 and a user object', async function () {
-    const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(retrievedUser);
-    const res = await chai.request(app).get(`${route}/${retrievedUser.id}`);
+  it('should return 200 and a token', async function () {
+    const findByEmailStub = sinon.stub(UserModel.prototype, 'findByEmail').resolves(retrievedUser);
+    const compareStub = sinon.stub(bcrypt, 'compare').resolves(true);
+    const res = await chai.request(app).post(`${route}/login`).send(loginCredentials);
     expect(res.status).to.equal(200);
     expect(res.body).to.be.an('object');
-    expect(res.body).to.have.property('id');
-    expect(res.body.displayName).to.equal(retrievedUser.displayName);
-    expect(res.body.email).to.equal(retrievedUser.email);
-    sinon.assert.calledOnce(findByIdStub);
+    expect(res.body).to.have.property('token');
+    sinon.assert.calledOnce(findByEmailStub);
+    sinon.assert.calledOnce(compareStub);
   });
-  it('should return 404 if user is not found', async function () {
-    const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(null);
-    const res = await chai.request(app).get(`${route}/${retrievedUser.id}`);
-    expect(res.status).to.equal(404);
-    expect(res.body).to.be.an('object');
-    expect(res.body).to.have.property('message');
-    expect(res.body.message).to.equal('User not found');
-    sinon.assert.calledOnce(findByIdStub);
-  });
-  it('should return 400 if id is invalid', async function () {
-    const res = await chai.request(app).get(`${route}/invalid_id`);
+  it('should return 400 if email is invalid', async function () {
+    const res = await chai.request(app).post(`${route}/login`).send({ email: userWithInvalidEmail.email, password: userWithInvalidEmail.password });
     expect(res.status).to.equal(400);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('message');
-    expect(res.body.message).to.equal('Invalid id');
+    expect(res.body.message).to.equal('Invalid email address');
+  });
+  it('should return 400 if password is too short', async function () {
+    const res = await chai.request(app).post(`${route}/login`).send({ email: userWithShortPassword.email, password: userWithShortPassword.password });
+    expect(res.status).to.equal(400);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Password must be at least 6 characters long');
+  });
+  it('should return 400 if email is empty', async function () {
+    const res = await chai.request(app).post(`${route}/login`).send({ email: userWithoutEmail.email, password: userWithoutEmail.password });
+    expect(res.status).to.equal(400);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Missing required fields');
+  });
+  it('should return 400 if password is empty', async function () {
+    const res = await chai.request(app).post(`${route}/login`).send({ email: userWithoutPassword.email, password: userWithoutPassword.password });
+    expect(res.status).to.equal(400);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('message');
+    expect(res.body.message).to.equal('Missing required fields');
   });
 });
+
+
 
 describe('put /users/:id Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
   it('should return 200 and a user object', async function () {
     const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(retrievedUser);
     const updateStub = sinon.stub(UserModel.prototype, 'update').resolves(retrievedUser);
-    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'decode').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).set('Authorization', 'admin token').send(newValidUser);
     expect(res.status).to.equal(200);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('id');
@@ -125,7 +144,10 @@ describe('put /users/:id Integration Tests', () => {
   });
   it('should return 404 if user is not found', async function () {
     const updateStub = sinon.stub(UserModel.prototype, 'update').resolves(null);
-    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'decode').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).set('Authorization', 'admin token').send(newValidUser);
     expect(res.status).to.equal(404);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('message');
@@ -134,7 +156,10 @@ describe('put /users/:id Integration Tests', () => {
   });
   it('should return 409 if email is already in use', async function () {
     const updateStub = sinon.stub(UserModel.prototype, 'update').throws({ code: 11000 });
-    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'decode').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).set('Authorization', 'admin token').send(newValidUser);
     expect(res.status).to.equal(409);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('message');
@@ -143,7 +168,10 @@ describe('put /users/:id Integration Tests', () => {
   });
   it('should return 500 if something goes wrong', async function () {
     const updateStub = sinon.stub(UserModel.prototype, 'update').throws({ message: 'Internal Server Error' });
-    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).send(newValidUser);
+    sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'decode').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
+    const res = await chai.request(app).put(`${route}/${retrievedUser.id}`).set('Authorization', 'admin token').send(newValidUser);
     expect(res.status).to.equal(500);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('message');
@@ -156,7 +184,10 @@ describe('delete /users/:id Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
   it('should return 200 and a user object', async function () {
     const deleteStub = sinon.stub(UserModel.prototype, 'delete').resolves(retrievedUser);
-    const res = await chai.request(app).delete(`${route}/${retrievedUser.id}`);
+    sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'decode').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
+    const res = await chai.request(app).delete(`${route}/${retrievedUser.id}`).set('Authorization', 'admin token');
     expect(res.status).to.equal(200);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('id');
@@ -166,7 +197,10 @@ describe('delete /users/:id Integration Tests', () => {
   });
   it('should return 404 if user is not found', async function () {
     const deleteStub = sinon.stub(UserModel.prototype, 'delete').resolves(null);
-    const res = await chai.request(app).delete(`${route}/${retrievedUser.id}`);
+    sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'decode').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
+    sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
+    const res = await chai.request(app).delete(`${route}/${retrievedUser.id}`).set('Authorization', 'admin token');
     expect(res.status).to.equal(404);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('message');

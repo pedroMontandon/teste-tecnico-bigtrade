@@ -2,7 +2,7 @@ import UserModel from '../models/UserModel';
 import { INewUser, IUser } from '../types/IUser';
 import { ServiceResponse } from '../types/ServiceResponseTypes';
 import JwtUtils from '../utils/JwtUtils';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
 export default class UserService {
   private userModel: UserModel;
@@ -29,8 +29,7 @@ export default class UserService {
 
   async login(email: string, password: string): Promise<ServiceResponse<{ token: string }>> {
     const retrievedUser = await this.userModel.findByEmail(email);
-    
-    if (!retrievedUser || await !bcrypt.compare(password, retrievedUser.password!)) {
+    if (!retrievedUser || !bcrypt.compareSync(password, retrievedUser.password!)) {
       return { status: 'INVALID_DATA', data: { message: 'Invalid email or password' } };
     }
     const token = this.jwtUtils.sign({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });

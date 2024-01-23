@@ -1,7 +1,7 @@
 import { Request, Router, Response } from 'express';
 import UserController from '../controllers/UserController';
 import UserValidations from '../middlewares/UserValidations';
-import TokenValidations from '../controllers/TokenValidations';
+import TokenValidations from '../middlewares/TokenValidations';
 
 const userController = new UserController();
 const router = Router();

@@ -35,6 +35,13 @@ export const userWithoutPassword: INewUser = {
   role: 'user'
 }
 
+export const userWithoutRole = {
+  displayName: 'Without Role',
+  email: 'withoutrole',
+  password: 'withoutrole',
+  role: ''
+}
+
 export const userWithInvalidEmail: INewUser = {
   displayName: 'Invalid Email',
   email: 'invalidemail',
@@ -47,4 +54,16 @@ export const userWithShortPassword: INewUser = {
   email: 'shortpassword@email.com',
   password: '123',
   role: 'user'
+}
+
+export const userWithInvalidRole = {
+  displayName: 'Invalid Role',
+  email: 'invalidrole@example.com',
+  password: 'invalidrole',
+  role: 'invalidrole'
+}
+
+export const loginCredentials = {
+  email: 'chapolin@colorado.com',
+  password: 'sigam-me os bons'
 }
