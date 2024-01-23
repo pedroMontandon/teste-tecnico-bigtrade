@@ -1,12 +1,12 @@
 import { Schema, Model, model } from 'mongoose';
-import { IPost } from '../types/IPost';
+import { INewPost, IPost } from '../types/IPost';
 
 const PostSchema = new Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
   userId: { type: String, required: true },
-  published: { type: Date, required: true },
-  updated: { type: Date, required: true },
+  published: { type: Date, required: true, default: Date.now },
+  updated: { type: Date, required: true, default: Date.now },
 });
 
 export default class PostModel {
@@ -16,7 +16,7 @@ export default class PostModel {
     this._model = model<IPost>('Post', PostSchema);
   }
 
-  async create(post: IPost): Promise<IPost | null> {
+  async create(post: INewPost): Promise<IPost | null> {
     const createdPost = await this._model.create(post);
     return createdPost.toObject();
   }
@@ -37,7 +37,7 @@ export default class PostModel {
     }
   }
 
-  async update(id: string, post: IPost): Promise<IPost | null> {
+  async update(id: string, post: INewPost): Promise<IPost | null> {
     return await this._model.findByIdAndUpdate(id, post);
   }
 

@@ -7,7 +7,8 @@ export default class PostController {
 
   async create(req: Request, res: Response) {
     const post = req.body;
-    const { status, data } = await this.postService.create(post);
+    const token = req.headers.authorization;
+    const { status, data } = await this.postService.create(post, token!);
     return res.status(mapStatusHTTP(status)).json(data);
   }
 

@@ -19,7 +19,7 @@ export default class UserService {
     try {
       const encryptedPassword = await bcrypt.hash(user.password, 10);
       const newUser = { ...user, password: encryptedPassword }
-      const createdUser =  await this.userModel.create(newUser);
+      const createdUser: Partial<IUser> | null =  await this.userModel.create(newUser);
       return { status: 'CREATED', data: createdUser };
     } catch (err: any) {
       if (err.code === 11000) return { status: 'CONFLICT', data: { message: this.emailInUse } };

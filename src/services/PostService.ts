@@ -1,18 +1,23 @@
 import PostModel from "../models/PostModel";
-import { IPost } from "../types/IPost";
+import { INewPost, IPost, IRawPost } from "../types/IPost";
 import { ServiceResponse } from "../types/ServiceResponseTypes";
+import JwtUtils from "../utils/JwtUtils";
 
 export default class PostService {
   private postModel: PostModel;
+  private jwtUtils;
   private postNotFound = "Post not found";
 
   constructor() {
     this.postModel = new PostModel();
+    this.jwtUtils = new JwtUtils();
   }
 
-  async create(post: IPost): Promise<ServiceResponse<IPost | null>> {
+  async create(post: IRawPost, token: string): Promise<ServiceResponse<IPost | null>> {
     try {
-      const createdPost = await this.postModel.create(post);
+      const { id } = this.jwtUtils.decode(token);
+      const newPost: INewPost = { ...post, userId: id };
+      const createdPost = await this.postModel.create(newPost);
       return { status: "CREATED", data: createdPost };
     } catch (err: any) {
       return {
