@@ -14,6 +14,7 @@ const route = '/users';
 
 describe('post /users Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
+  after(() => { sinon.restore(); });
   it('should return 201 and a user object', async function () {
     const createStub = sinon.stub(UserModel.prototype, 'create').resolves(retrievedUser);
     const res = await chai.request(app).post(route).send(newValidUser);

@@ -43,6 +43,7 @@ describe('get /posts Integration Tests', () => {
 
 describe('get /posts/:id Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
+  after(() => { sinon.restore(); });
   it('should return 200 and a post object', async function () {
     const findByIdStub = sinon.stub(PostModel.prototype, 'findById').resolves(validPosts[0]);
     const res = await chai.request(app).get(`${route}/${validPosts[0].id}`);

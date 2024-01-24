@@ -15,6 +15,7 @@ const route = '/users';
 
 describe('post /users/login Integration Tests', () => {
     beforeEach(() => { sinon.restore(); });
+    after(() => { sinon.restore(); });
     it('should return 200 and a token', async function () {
       const findByEmailStub = sinon.stub(UserModel.prototype, 'findByEmail').resolves(retrievedUser);
       const compareStub = sinon.stub(bcrypt, 'compareSync').returns(true);

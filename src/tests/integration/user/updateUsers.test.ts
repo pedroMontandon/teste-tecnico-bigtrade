@@ -15,6 +15,7 @@ const route = '/users';
 
 describe('put /users/:id Integration Tests', () => {
     beforeEach(() => { sinon.restore(); });
+    after(() => { sinon.restore(); });
     it('should return 200 and a user object', async function () {
       const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(retrievedUser);
       const updateStub = sinon.stub(UserModel.prototype, 'update').resolves(retrievedUser);

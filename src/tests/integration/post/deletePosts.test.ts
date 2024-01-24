@@ -16,6 +16,7 @@ const route = '/posts';
 
 describe('delete /posts Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
+  after(() => { sinon.restore(); });
   it('should return 201 and a post object', async function () {
     const deleteStub = sinon.stub(PostModel.prototype, 'delete').resolves(validPosts[0]);
     const decodedStub = sinon.stub(JwtUtils.prototype, 'decode').returns(decryptedUser);

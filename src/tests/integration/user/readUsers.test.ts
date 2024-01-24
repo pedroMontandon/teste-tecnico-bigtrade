@@ -14,6 +14,7 @@ const route = '/users';
 
 describe('get /users/:id Integration Tests', () => {
     beforeEach(() => { sinon.restore(); });
+    after(() => { sinon.restore(); });
     it('should return 200 and a user object', async function () {
       const findByIdStub = sinon.stub(UserModel.prototype, 'findById').resolves(retrievedUser);
       const res = await chai.request(app).get(`${route}/${retrievedUser.id}`);

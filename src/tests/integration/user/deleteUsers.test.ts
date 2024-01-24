@@ -16,6 +16,7 @@ const route = '/users';
 
 describe('delete /users/:id Integration Tests', () => {
     beforeEach(() => { sinon.restore(); });
+    after(() => { sinon.restore(); });
     it('should return 200 and a user object', async function () {
       const deleteStub = sinon.stub(UserModel.prototype, 'delete').resolves(retrievedUser);
       sinon.stub(JwtUtils.prototype, 'verify').returns({ id: retrievedUser.id!, email: retrievedUser.email!, role: retrievedUser.role! });
