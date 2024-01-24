@@ -17,7 +17,7 @@ const route = '/posts';
 
 describe('put /posts Integration Tests', () => {
   beforeEach(() => { sinon.restore(); });
-  afterEach(() => { sinon.restore(); });
+  after(() => { sinon.restore(); });
   it('should return 200 and a post object with updated title', async function () {
     const updateStub = sinon.stub(PostModel.prototype, 'update').resolves(validPosts[0]);
     sinon.stub(JwtUtils.prototype, 'decode').returns(decryptedUser);

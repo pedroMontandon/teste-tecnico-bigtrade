@@ -5,8 +5,8 @@ const PostSchema = new Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
   userId: { type: String, required: true },
-  published: { type: Date, required: true, default: Date.now },
-  updated: { type: Date, required: true, default: Date.now },
+}, {
+  timestamps: { createdAt: 'published', updatedAt: 'updated' },
 });
 
 export default class PostModel {
