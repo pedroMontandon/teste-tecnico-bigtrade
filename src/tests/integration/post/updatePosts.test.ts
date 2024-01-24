@@ -20,6 +20,7 @@ describe('put /posts Integration Tests', () => {
   after(() => { sinon.restore(); });
   it('should return 200 and a post object with updated title', async function () {
     const updateStub = sinon.stub(PostModel.prototype, 'update').resolves(validPosts[0]);
+    sinon.stub(PostModel.prototype, 'findById').resolves(validPosts[0]);
     sinon.stub(JwtUtils.prototype, 'decode').returns(decryptedUser);
     sinon.stub(JwtUtils.prototype, 'verify').returns(decryptedUser);
     sinon.stub(JwtUtils.prototype, 'isAdmin').returns(true);
