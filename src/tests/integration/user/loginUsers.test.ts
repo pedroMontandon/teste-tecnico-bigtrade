@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http';
 
 import App from '../../../App';
 import UserModel from '../../../models/UserModel';
-import { loginCredentials, newValidUser, retrievedUser, userWithInvalidEmail, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword } from '../../mocks/newUserMocks';
+import { loginCredentials, newValidUser, retrievedUser, userWithInvalidEmail, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword } from '../../mocks/usersMocks';
 import bcrypt from 'bcryptjs';
 
 chai.use(chaiHttp);

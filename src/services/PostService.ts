@@ -29,6 +29,8 @@ export default class PostService {
 
   async findAll(): Promise<ServiceResponse<Partial<IPost>[]>> {
     const posts = await this.postModel.findAll();
+    if (!posts || posts.length === 0)
+      return { status: "NOT_FOUND", data: { message: "No posts found" } };
     return { status: "SUCCESSFUL", data: posts };
   }
 
@@ -39,8 +41,11 @@ export default class PostService {
     return { status: "SUCCESSFUL", data: post };
   }
 
-  async update(id: string, post: IPost): Promise<ServiceResponse<IPost | null>> {
+  async update(id: string, post: IPost, token: string): Promise<ServiceResponse<IPost | null>> {
     try {
+      if (!this.jwtUtils.isAdmin(token) && id !== this.jwtUtils.decode(token).id) {
+        return { status: "UNAUTHORIZED", data: { message: "You are not authorized to update this post" } };
+      }
       const updatedPost = await this.postModel.update(id, post);
       if (!updatedPost)
         return { status: "NOT_FOUND", data: { message: this.postNotFound } };
@@ -54,7 +59,10 @@ export default class PostService {
     }
   }
 
-  async delete(id: string): Promise<ServiceResponse<IPost>> {
+  async delete(id: string, token: string): Promise<ServiceResponse<IPost>> {
+    if (!this.jwtUtils.isAdmin(token) && id !== this.jwtUtils.decode(token).id) {
+      return { status: "UNAUTHORIZED", data: { message: "You are not authorized to delete this post" } };
+    }
     const deletedPost = await this.postModel.delete(id);
     if (!deletedPost)
       return { status: "NOT_FOUND", data: { message: this.postNotFound } };

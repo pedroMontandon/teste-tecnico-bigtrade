@@ -1,8 +1,6 @@
 export interface IRawPost {
   title: string;
   content: string;
-  // published: Date;
-  // updated: Date;
 }
 
 export interface INewPost extends IRawPost {

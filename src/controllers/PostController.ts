@@ -26,13 +26,15 @@ export default class PostController {
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const post = req.body;
-    const { status, data } = await this.postService.update(id, post);
+    const token = req.headers.authorization;
+    const { status, data } = await this.postService.update(id, post, token!);
     return res.status(mapStatusHTTP(status)).json(data);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const { status, data } = await this.postService.delete(id);
+    const token = req.headers.authorization;
+    const { status, data } = await this.postService.delete(id, token!);
     return res.status(mapStatusHTTP(status)).json(data);
   }
 }

@@ -67,3 +67,9 @@ export const loginCredentials = {
   email: 'chapolin@colorado.com',
   password: 'sigam-me os bons'
 }
+
+export const decryptedUser = {
+  id: '65afcaf902208fe6f4ade88d',
+  email: 'chapolin@colorado.com',
+  role: 'admin',
+}

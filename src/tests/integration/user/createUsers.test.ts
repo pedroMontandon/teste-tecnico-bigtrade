@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http';
 
 import App from '../../../App';
 import UserModel from '../../../models/UserModel';
-import { newValidUser, retrievedUser, userWithInvalidEmail, userWithInvalidRole, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword, userWithoutRole } from '../../mocks/newUserMocks';;
+import { newValidUser, retrievedUser, userWithInvalidEmail, userWithInvalidRole, userWithShortPassword, userWithoutDisplayName, userWithoutEmail, userWithoutPassword, userWithoutRole } from '../../mocks/usersMocks';;
 
 chai.use(chaiHttp);
 const { expect } = chai;

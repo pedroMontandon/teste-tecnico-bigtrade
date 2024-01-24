@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http';
 
 import App from '../../../App';
 import UserModel from '../../../models/UserModel';
-import { newValidUser, retrievedUser } from '../../mocks/newUserMocks';
+import { newValidUser, retrievedUser } from '../../mocks/usersMocks';
 import JwtUtils from '../../../utils/JwtUtils';
 
 chai.use(chaiHttp);
@@ -66,7 +66,7 @@ describe('put /users/:id Integration Tests', () => {
       expect(res.body.message).to.equal('Internal Server Error');
       sinon.assert.calledOnce(updateStub);
     });
-    it('should return 401 if it is an admin trying to update another user', async function () {
+    it('should return 401 if it is not an admin trying to update another user', async function () {
       sinon.stub(JwtUtils.prototype, 'verify').returns({ id: 'another user id', email: retrievedUser.email!, role: 'user' });
       sinon.stub(JwtUtils.prototype, 'decode').returns({ id: 'another user id', email: retrievedUser.email!, role: 'user' });
       sinon.stub(JwtUtils.prototype, 'isAdmin').returns(false);
